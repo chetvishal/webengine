@@ -2,19 +2,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { initiallizeContainer } from '../../redux/features/webcontainerSlice';
 import { WebContainer } from '@webcontainer/api';
 import { useEffect ,useLayoutEffect,useRef } from 'react';
-import { webcontainerInstance } from '../../constants';
 
 
 const TopBar = ({ codeEditorText }) => {
 
     const dispatch = useDispatch();
+    const webcontainer = useSelector(state => state.webcontainer)
     
     return <div>
         <button onClick={async () => {
-            console.log("webcontainerInstance: ", webcontainerInstance)
+            console.log("webcontaienr", webcontainer.selectedFile)
             //  const res = await WebContainer.boot();
             dispatch(initiallizeContainer())
-        }}>run</button>
+        }}>run boy run</button>
     </div>
 }
 

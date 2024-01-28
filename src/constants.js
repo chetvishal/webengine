@@ -1,15 +1,12 @@
 import { WebContainer } from '@webcontainer/api';
 
-export const webcontainerInstance = await WebContainer.boot()
+// export const webcontainerInstance = await WebContainer.boot()
 export const files = {
     'public': {
       directory: {
         'index.html': {
           file: {
             contents: `
-            <script src="https://unpkg.com/react@^18.1.0"></script>
-            <script src="https://unpkg.com/react-dom@^18.1.0"></script>
-            <script src="https://unpkg.com/react-scripts@latest"></script>
             <div id="app"></div>
             `
           },
@@ -112,4 +109,4 @@ export const files = {
         `
       }
     }
-  }
+}
