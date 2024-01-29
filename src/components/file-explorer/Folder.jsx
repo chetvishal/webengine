@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch } from "react-redux";
-import { selectFile } from "../../redux/features/webcontainerSlice";
+import { selectFile, addFile, addFolder } from "../../redux/features/webcontainerSlice";
+import { useWebContainerContext } from "../../redux/WebContainerContext";
 
 function Folder({ name, explorer2, firstTime, path }) {
 
@@ -11,6 +12,7 @@ function Folder({ name, explorer2, firstTime, path }) {
         isFolder: null
     })
     const dispatch = useDispatch()
+    const { webcontainerInstance } = useWebContainerContext()
 
     const handleNewFolder = (e, isFolder) => {
         e.stopPropagation();
@@ -21,11 +23,26 @@ function Folder({ name, explorer2, firstTime, path }) {
         })
     }
 
-    const onAddFolder = (e) => {
+    const onAddFolder = async (e) => {
         if (e.keyCode === 13 && e.target.value) {
             //add logic
             // handleInsertNode(explorer.id, e.target.value, showInput.isFolder)
             setShowInput({ ...showInput, visible: false })
+            if(showInput.isFolder) {
+                dispatch(addFolder({
+                    path: `${path}/${e.target.value}`, 
+                    wcInstance: webcontainerInstance,
+                    fileName: e.target.value
+                }))
+            }
+            else {
+                dispatch(addFile({
+                    path: `${path}/${e.target.value}`, 
+                    wcInstance: webcontainerInstance,
+                    fileName: e.target.value
+                }))
+                
+            }
         }
     }
 
@@ -70,7 +87,13 @@ function Folder({ name, explorer2, firstTime, path }) {
 
                 {Object.keys(explorer2.directory).map((exp) => {
                     return (
-                        <Folder explorer2={explorer2.directory[exp]} name={exp} firstTime={false} key={uuidv4()} path={`${path}/${exp}`}/>
+                        <Folder 
+                            explorer2={explorer2.directory[exp]}
+                            name={exp} 
+                            firstTime={false} 
+                            key={uuidv4()} 
+                            path={`${path}/${exp}`}
+                        />
                     )
                 })}
             </div>

@@ -3,7 +3,7 @@ import Folder from "./Folder";
 import useTraverseTree from "./use-traverse-tree";
 import { useState } from "react";
 import './styles.css'
-import { files } from "../../constants";
+// import { files } from "../../constants";
 
 
 const explorer = {
@@ -86,6 +86,7 @@ const FileExplorer = () => {
         const finalTree = insertNode(explorerData, folderId, item, isFolder)
         setExplorerData(finalTree);
     }
+    const files = useSelector(state => state.webcontainer.files)
 
     return (
         <>
