@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch } from "react-redux";
 import { selectFile, addFile, addFolder } from "../../redux/features/webcontainerSlice";
 import { useWebContainerContext } from "../../redux/WebContainerContext";
 
-function Folder({ name, explorer2, firstTime, path }) {
+function Folder({ name, explorer, firstTime, path }) {
 
     const [expand, setExpand] = useState(false);
     const [showInput, setShowInput] = useState({
@@ -47,10 +47,10 @@ function Folder({ name, explorer2, firstTime, path }) {
     }
 
     if (firstTime) {
-        return Object.keys(explorer2).map((exp) => {
+        return Object.keys(explorer).map((exp) => {
             return (
                 <Folder 
-                    explorer2={explorer2[exp]}
+                    explorer={explorer[exp]}
                     name={exp}
                     firstTime={false}
                     key={uuidv4()}
@@ -60,7 +60,7 @@ function Folder({ name, explorer2, firstTime, path }) {
         })
     }
 
-    if (explorer2.hasOwnProperty('directory')) {
+    if (explorer.hasOwnProperty('directory')) {
         return <div style={{ marginTop: 5 }}>
             <div className="folder" onClick={() => setExpand((a) => !a)}>
                 <span>📁{name}</span>
@@ -85,10 +85,10 @@ function Folder({ name, explorer2, firstTime, path }) {
                     )
                 }
 
-                {Object.keys(explorer2.directory).map((exp) => {
+                {Object.keys(explorer.directory).map((exp) => {
                     return (
                         <Folder 
-                            explorer2={explorer2.directory[exp]}
+                            explorer={explorer.directory[exp]}
                             name={exp} 
                             firstTime={false} 
                             key={uuidv4()} 

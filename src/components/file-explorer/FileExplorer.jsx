@@ -1,103 +1,45 @@
 import { useSelector } from "react-redux";
 import Folder from "./Folder";
-import useTraverseTree from "./use-traverse-tree";
 import { useState } from "react";
 import './styles.css'
+import { addDependency } from "../../redux/features/webcontainerSlice";
+import { useDispatch } from "react-redux";
+import { useWebContainerContext } from "../../redux/WebContainerContext";
 // import { files } from "../../constants";
-
-
-const explorer = {
-    id:"1",
-    name: "root",
-    isFolder: true,
-    items: [
-      {
-        id:"2",
-        name: "public",
-        isFolder: true,
-        items: [
-          {
-            id:"3",
-            name: "public nested 1",
-            isFolder: true,
-            items: [
-              {
-                id:"4",
-                name: "index.html",
-                isFolder: false,
-                items: []
-              },
-              {
-                id:"5",
-                name: "hello.html",
-                isFolder: false,
-                items: []
-              }
-            ]
-          },
-          {
-            id:"6",
-            name: "public_nested_file",
-            isFolder: false,
-            items: []
-          }
-        ]
-      },
-      {
-        id:"7",
-        name: "src",
-        isFolder: true,
-        items: [
-          {
-            id:"8",
-            name: "App.js",
-            isFolder: false,
-            items: []
-          },
-          {
-            id:"9",
-            name: "Index.js",
-            isFolder: false,
-            items: []
-          },
-          {
-            id:"10",
-            name: "styles.css",
-            isFolder: false,
-            items: []
-          }
-        ]
-      },
-      {
-        id:"11",
-        name: "package.json",
-        isFolder: false,
-        items: []
-      }
-    ]
-};
 
 const FileExplorer = () => {
 
-    const [explorerData, setExplorerData] = useState(explorer);
-    const { insertNode } = useTraverseTree()
+    const [newPckgName, setNewPckgName] = useState('')
+    const dispatch = useDispatch()
 
-    const handleInsertNode = (folderId, item, isFolder) => {
-        const finalTree = insertNode(explorerData, folderId, item, isFolder)
-        setExplorerData(finalTree);
-    }
+    const { webcontainerInstance } = useWebContainerContext()
     const files = useSelector(state => state.webcontainer.files)
+    const packages = useSelector(state => state.webcontainer.packages)
+    const isPackageInstalling = useSelector(state => state.webcontainer.loadingPckg)
+    const handleAddNewPckg = (e) => {
+      e.preventDefault()
+      dispatch(addDependency({ wcInstance: webcontainerInstance, pckgName: newPckgName }))
+      setNewPckgName('')
+    }
 
     return (
-        <>
-            <Folder
-                handleInsertNode={handleInsertNode}
-                explorer={explorerData}
-                explorer2={files}
-                name={"file"}
-                firstTime={true}
-             />
-        </>
+      <>
+        <Folder
+          explorer={files}
+          name={"file"}
+          firstTime={true}
+        />
+        <form onSubmit={handleAddNewPckg}>
+          <input onChange={e => setNewPckgName(e.target.value)} value={newPckgName} />
+          <button type="submit" disabled={isPackageInstalling}>{isPackageInstalling ? "Installing..." : "submit"}</button>
+        </form>
+        {
+          packages.map(pckg => (
+            <p key={pckg.name}>{pckg.name}</p>
+          ))
+        }
+
+      </>
     )
 
 }

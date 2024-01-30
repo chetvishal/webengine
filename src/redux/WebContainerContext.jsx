@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef, useContext, createContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { WebContainer } from '@webcontainer/api';
-import { setUrl } from "./features/webcontainerSlice";
+import { setUrl, selectFile } from "./features/webcontainerSlice";
 
 const webcontainerContext = createContext();
 export const useWebContainerContext = () => useContext(webcontainerContext);
@@ -16,11 +16,11 @@ export const WebContainerContextProvider = ({ children }) => {
     const installDependencies = useCallback(async function () {
         // Install dependencies
         const installProcess = await webcontainerInstance.current.spawn('npm', ['install']);
-        installProcess.output.pipeTo(new WritableStream({
-            write(data) {
-                console.log(data)
-            }
-        }));
+        // installProcess.output.pipeTo(new WritableStream({
+        //     write(data) {
+        //         console.log(data)
+        //     }
+        // }));
         return installProcess.exit;
     }, [])
 
@@ -32,6 +32,7 @@ export const WebContainerContextProvider = ({ children }) => {
 
             webcontainerInstance.current.on('server-ready', (port, url) => {
                 dispatch(setUrl(url))
+                dispatch(selectFile('/src/App.js'))
                 setLoading(false)
             });
 

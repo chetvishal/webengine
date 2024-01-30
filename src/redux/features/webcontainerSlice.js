@@ -1,5 +1,3 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import { WebContainer } from '@webcontainer/api';
 import { buildCreateSlice, asyncThunkCreator, current } from '@reduxjs/toolkit'
 import { files } from "../../constants";
@@ -34,20 +32,24 @@ function addFileByPath(obj, path, contents, directory = false) {
   return newObj;
 }
 
-// export const getPost = createAsyncThunk("posts/getPost", async ({ postId, token }) => {
-//   try {
-//     const response = await axios.get(`${apiEndPoint()}/post/${postId}`, {
-//       headers: {
-//         'Authorization': token
-//       }
-//     });
-//     return response.data.post;
-//   }
-//   catch (error) {
-//     console.log("Error fetching post: ", error.message);
-//     throw new Error(error.message);
-//   }
-// })
+function installDependency(wcInstance, pckgName) {
+
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      const serverProcess = await wcInstance.current.spawn('npm', ['install', pckgName]);
+      const exitCode = await serverProcess.exit;
+      if(exitCode === 0)
+        resolve(`Successfully install ${pckgName}`)
+      else 
+        reject(`Failed to install ${pckgName}`)
+
+    }
+    catch(err) {
+      reject(`Failed to install ${pckgName}`)
+    }
+  })
+}
 
 export const webcontainerSlice = createAppSlice({
   name: 'webcontainer',
@@ -58,7 +60,16 @@ export const webcontainerSlice = createAppSlice({
     loading: true,
     selectedFile: {
       path: ''
-    }
+    },
+    packages: [
+      {
+        name: "react"
+      },
+      {
+        name: "react-dom"
+      },
+    ],
+    loadingPckg: false
   },
   reducers: (create) => ({
 
@@ -79,8 +90,7 @@ export const webcontainerSlice = createAppSlice({
           state.loading = false
         },
         fulfilled: (state, action) => {
-          state.loading = false
-          console.log("action.payload: ", action.payload)
+          state.loading = false;
           state.webcontainerInstance = action.payload;
         },
       }
@@ -118,7 +128,34 @@ export const webcontainerSlice = createAppSlice({
         }
       }
     ),
+    addDependency: create.asyncThunk(
+      async ({ wcInstance, pckgName }) => {
+        await installDependency(wcInstance, pckgName)
+        return { pckgName }
+      },
+      {
+        pending: (state, action) => {
+          state.loadingPckg = true;
+        },
+        rejected: (state, action) => {
+          state.loadingPckg = false;
+          alert(action.error.message)
+        },
+        fulfilled: (state, action) => {
+          state.loadingPckg = false;
+          state.packages = [...state.packages, { name: action.payload.pckgName }]
+          // state.packages = addFileByPath(current(state.files), action.payload.path, '', true)
+        }
+      }
+    ),
   })
 });
-export const { initiallizeContainer, setUrl, selectFile, addFile, addFolder } = webcontainerSlice.actions;
+export const {
+  initiallizeContainer,
+  setUrl,
+  selectFile,
+  addFile,
+  addFolder,
+  addDependency
+} = webcontainerSlice.actions;
 export default webcontainerSlice.reducer;
