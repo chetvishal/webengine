@@ -17,9 +17,9 @@ export const WebContainerContextProvider = ({ children }) => {
         // Install dependencies
         const installProcess = await webcontainerInstance.current.spawn('npm', ['install']);
         // installProcess.output.pipeTo(new WritableStream({
-        //     write(data) {
-        //         console.log(data)
-        //     }
+            //     write(data) {
+                //         console.log(data)
+            //     }
         // }));
         return installProcess.exit;
     }, [])
@@ -32,7 +32,7 @@ export const WebContainerContextProvider = ({ children }) => {
 
             webcontainerInstance.current.on('server-ready', (port, url) => {
                 dispatch(setUrl(url))
-                dispatch(selectFile('/src/App.js'))
+                dispatch(selectFile('/src/App.jsx'))
                 setLoading(false)
             });
 
@@ -40,7 +40,7 @@ export const WebContainerContextProvider = ({ children }) => {
             if (exitCode !== 0) {
                 throw new Error('Installation failed');
             };
-            await webcontainerInstance.current.spawn('npm', ['run', 'start']);
+            await webcontainerInstance.current.spawn('npm', ['run', 'dev']);
 
         })()
     }, []);
