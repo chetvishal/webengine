@@ -56,19 +56,22 @@ const CodeEditor = (
     return <div className={styles.codeEditorContainer}>
         <Editor
             height="85vh"
-            width={`100vw`}
+            width={`100%`}
             defaultValue="// some comment"
             // language={language || "javascript"}
             value={value}
             // theme={theme}
             onChange={handleEditorChange}
+            language="javascript"
             options={{
                 minimap: {
                   enabled: false,
                 },
                 scrollBeyondLastLine: false,
-                renderLineHighlight: "none"
-            }}
+                renderLineHighlight: "none",
+                wordWrap: "on",
+                colorDecorators: true
+            }}                                                                                                                                                                   
         />
     </div>
 }

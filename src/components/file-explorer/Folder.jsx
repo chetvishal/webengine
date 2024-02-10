@@ -1,8 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectFile, addFile, addFolder } from "../../redux/features/webcontainerSlice";
 import { useWebContainerContext } from "../../redux/WebContainerContext";
+import moreThan from '../../assets/moreThan.svg';
+import addFileIcon from '../../assets/addFile.svg';
+import addDirectory from '../../assets/addDirectory.svg';
+import downArrow from '../../assets/downArrow.svg'
+
 
 function Folder({ name, explorer, firstTime, path }) {
 
@@ -13,6 +18,7 @@ function Folder({ name, explorer, firstTime, path }) {
     })
     const dispatch = useDispatch()
     const { webcontainerInstance } = useWebContainerContext()
+    const selectedFilePath = useSelector(state => state.webcontainer.selectedFile.path)
 
     const handleNewFolder = (e, isFolder) => {
         e.stopPropagation();
@@ -47,13 +53,13 @@ function Folder({ name, explorer, firstTime, path }) {
     }
 
     if (firstTime) {
-        return Object.keys(explorer).map((exp) => {
+        return Object.keys(explorer).map((exp, idx) => {
             return (
                 <Folder 
                     explorer={explorer[exp]}
                     name={exp}
                     firstTime={false}
-                    key={uuidv4()}
+                    key={idx}
                     path={exp}  
                 />
             )
@@ -62,14 +68,32 @@ function Folder({ name, explorer, firstTime, path }) {
 
     if (explorer.hasOwnProperty('directory')) {
         return <div style={{ marginTop: 5 }}>
-            <div className="folder" onClick={() => setExpand((a) => !a)}>
-                <span>📁{name}</span>
-                <div>
-                    <button onClick={e => handleNewFolder(e, true)}>Folder +</button>
-                    <button onClick={e => handleNewFolder(e, false)}>File +</button>
+            <div
+                className="flex cursor-pointer p-1 justify-between mt-1"
+                onClick={(e) => {
+                    setExpand((a) => {
+                        return !a
+                    })
+                }
+                }
+            >
+                <div className="flex items-center">
+                    {
+                        expand ?
+                            <img src={downArrow} className="w-4" /> :
+                            <img src={moreThan} className="w-4" />
+                    }
+                    <span>📁{name}</span>
+                </div>
+                <div className="flex items-center">
+                    <img src={addFileIcon} className="w-4 text-blue-200" onClick={e => handleNewFolder(e, false)}/>
+                    <img src={addDirectory} className="w-4" onClick={e => handleNewFolder(e, true)}/>
                 </div>
             </div>
-            <div style={{ display: expand ? "block" : "none", paddingLeft: "2rem" }}>
+            <div
+                style={{ display: expand ? "block" : "none" }}
+                className="pl-8 "
+            >
                 {
                     showInput.visible && (
                         <div className="inputContainer">
@@ -84,14 +108,13 @@ function Folder({ name, explorer, firstTime, path }) {
                         </div>
                     )
                 }
-
-                {Object.keys(explorer.directory).map((exp) => {
+                {Object.keys(explorer.directory).map((exp, idx) => {
                     return (
-                        <Folder 
+                        <Folder
                             explorer={explorer.directory[exp]}
-                            name={exp} 
-                            firstTime={false} 
-                            key={uuidv4()} 
+                            name={exp}
+                            firstTime={false}
+                            key={idx}
                             path={`${path}/${exp}`}
                         />
                     )
@@ -100,8 +123,14 @@ function Folder({ name, explorer, firstTime, path }) {
         </div>
     }
     else {
-        return <span className="file" onClick={() => dispatch(selectFile(path))}>📄 {name}</span>
+        return <span className="w-full block">
+            <span className={`flex flex-col pl-1 cursor-pointer ${selectedFilePath === path ? "bg-blue-200" : ""}`}
+                onClick={(e) => {
+                    dispatch(selectFile(path))
+                }
+                }>📄 {name}</span>
+        </span>
     }
 }
 
-export default Folder;
+export default React.memo(Folder);

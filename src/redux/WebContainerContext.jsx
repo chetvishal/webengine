@@ -32,7 +32,7 @@ export const WebContainerContextProvider = ({ children }) => {
 
             webcontainerInstance.current.on('server-ready', (port, url) => {
                 dispatch(setUrl(url))
-                dispatch(selectFile('/src/App.jsx'))
+                dispatch(selectFile('src/App.jsx'))
                 setLoading(false)
             });
 
