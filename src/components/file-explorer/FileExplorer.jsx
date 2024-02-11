@@ -29,7 +29,7 @@ const FileExplorer = () => {
     })
 
     return (
-      <div>
+      <div className="bg-white h-full">
         <div className="flex cursor-pointer p-1 justify-start mt-1" onClick={(e) => {
           // e.stopPropagation()
           setExpand((a) => ({

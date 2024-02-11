@@ -5,21 +5,10 @@ import { useEffect ,useLayoutEffect,useRef } from 'react';
 import { useWebContainerContext } from '../../redux/WebContainerContext';
 
 
-const TopBar = ({ codeEditorText }) => {
+const TopBar = () => {
 
-    const dispatch = useDispatch();
-    const webcontainer = useSelector(state => state.webcontainer)
-    const { webcontainerInstance } = useWebContainerContext()
-    
-    return <div>
-        <button onClick={async () => {
-            console.log("webcontaienr", webcontainer.selectedFile)
-            console.log("files: ", webcontainer)
-            //  const res = await WebContainer.boot();
-            const seee = await webcontainerInstance.current.fs.readdir('/src');
-            console.log("seee: ", seee)
-            dispatch(initiallizeContainer())
-        }}>run boy run</button>
+    return <div className='h-[3%]'>
+        <button>Webengine</button>
     </div>
 }
 

@@ -12,6 +12,7 @@
   "dependencies": {
     "@blueprintjs/core": "^5.8.2",
     "@blueprintjs/icons": "^5.7.0",
+    "@heroicons/react": "^2.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@reduxjs/toolkit": "^2.0.1",
     "@webcontainer/api": "^1.1.8",

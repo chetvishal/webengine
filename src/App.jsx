@@ -19,7 +19,9 @@ function App() {
           <Loader />
           :
           <>
-            <TopBar codeEditorText={codeEditorText} />
+            <TopBar 
+              codeEditorText={codeEditorText} 
+            />
             <DraggableWindow
               setCodeEditorText={setCodeEditorText}
               outputContent={outputContent}
