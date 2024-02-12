@@ -7,28 +7,19 @@ import FileExplorer from '../file-explorer/FileExplorer';
 import './styles.css'
 
 
-const TITLE_MAP = {
+const MAP = {
     "Files": () => <FileExplorer />,
     "Editor": ({setCodeEditorText}) => <CodeEditor setCodeEditorText={setCodeEditorText} />,
     "Preview": ({isWindowResizing}) => <BrowserWindow isWindowResizing={isWindowResizing} />,
 };
 
-const position = {
-    direction: 'row',
-    first: {
-        direction: 'row',
-        first: 'Files',
-        second: 'Editor',
-        splitPercentage: "30"
-    },
-    second: 'Preview',
-    splitPercentage: "60"
-}
-
-const DraggableWindow = ({setCodeEditorText}) => {
+const DraggableWindow = ({setCodeEditorText, setLayout, layout}) => {
 
     const [isWindowResizing, setIsWindowResizing] = useState(false);
+    
+
     const handleChange = useCallback((e) => {
+        setLayout(e);
         setIsWindowResizing(true)
     }, [])
 
@@ -44,12 +35,13 @@ const DraggableWindow = ({setCodeEditorText}) => {
                     title={id}
                     toolbarControls={[]}
                 >
-                    {TITLE_MAP[id]({ setCodeEditorText, isWindowResizing })}
+                    {MAP[id]({ setCodeEditorText, isWindowResizing })}
                 </MosaicWindow>
             )}
             onChange={handleChange}
             onRelease={handleRelease}
-            initialValue={position}
+            value={layout}
+            // initialValue={position}
         />
     )
 

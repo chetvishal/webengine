@@ -5,11 +5,28 @@ import TopBar from './components/top-bar/TopBar'
 import Loader from './components/loader/Loader';
 import { useWebContainerContext } from './redux/WebContainerContext'
 
+const initialLayout = {
+  direction: 'row',
+  first: {
+      direction: 'row',
+      first: 'Files',
+      second: 'Editor',
+      splitPercentage: "30"
+  },
+  second: 'Preview',
+  splitPercentage: "60"
+}
+
 function App() {
 
   const [codeEditorText, setCodeEditorText] = useState("")
   const [outputContent, setOutputContent] = useState("")
   const webcContext = useWebContainerContext()
+  const [layout, setLayout] = useState(initialLayout)
+
+  const resetLayout = useCallback(() => {
+    setLayout(initialLayout)
+  }, []);
 
   return (
     <div id="app">
@@ -21,10 +38,13 @@ function App() {
           <>
             <TopBar 
               codeEditorText={codeEditorText} 
+              resetLayout={resetLayout}
             />
             <DraggableWindow
               setCodeEditorText={setCodeEditorText}
               outputContent={outputContent}
+              layout={layout}
+              setLayout={setLayout}
             />
           </>
       }
