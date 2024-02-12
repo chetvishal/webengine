@@ -1,7 +1,6 @@
 import loader from '../../assets/Gear-loader-noanim.svg';
 import { RectangleGroupIcon } from '@heroicons/react/24/outline'
 
-
 const TopBar = ({resetLayout}) => {
 
     return <div className='h-[5%] flex items-center justify-between bg-[#E6F4F1]'>
