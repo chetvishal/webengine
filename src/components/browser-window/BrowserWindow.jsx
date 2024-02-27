@@ -1,14 +1,25 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { ArrowPathIcon } from '@heroicons/react/24/solid'
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 const BrowserWindow = ({ isWindowResizing }) => {
 
     const webcontainerState = useSelector(state => state.webcontainer);
     const browserRef = useRef()
 
-    const handleRefreshBtn = useCallback(() => {
+    const handleRefresh = () => {
         browserRef.current.src = browserRef.current.src
+    }
+
+    useEffect(() => {
+        document.addEventListener('refresh', handleRefresh)
+        return () => {
+            document.removeEventListener('refresh')
+        }
+    }, []);
+
+    const handleRefreshBtn = useCallback(() => {
+        handleRefresh()
     }, []);
 
     return (

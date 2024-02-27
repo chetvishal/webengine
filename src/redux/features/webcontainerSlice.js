@@ -7,6 +7,53 @@ export const createAppSlice = buildCreateSlice({
   creators: { asyncThunk: asyncThunkCreator },
 })
 
+function renameFileOrFolderByPath(obj, path, newName) {
+  const keys = path.split('/');
+  let newObj = cloneDeep(obj);
+  let currentObj = newObj;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (!currentObj[key] || !currentObj[key].directory) {
+      // Directory not found
+      return newObj; // Return the original object
+    }
+    currentObj = currentObj[key].directory;
+  }
+
+  const oldName = keys[keys.length - 1];
+  if (currentObj[oldName]) {
+    // If the file or folder exists, rename it
+    currentObj[newName] = currentObj[oldName];
+    delete currentObj[oldName];
+  }
+
+  return newObj;
+}
+
+function deleteFileOrFolderByPath(obj, path) {
+  const keys = path.split('/');
+  let newObj = cloneDeep(obj);
+  let currentObj = newObj;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (!currentObj[key] || !currentObj[key].directory) {
+      // Directory not found
+      return newObj; // Return the original object
+    }
+    currentObj = currentObj[key].directory;
+  }
+
+  const fileName = keys[keys.length - 1];
+  if (currentObj[fileName]) {
+    // If the file or folder exists, delete it
+    delete currentObj[fileName];
+  }
+
+  return newObj;
+}
+
 function addFileByPath(obj, path, contents, directory = false) {
   const keys = path.split('/');
   let newObj = cloneDeep(obj)
@@ -76,6 +123,7 @@ export const webcontainerSlice = createAppSlice({
     setUrl: create.reducer((state, action) => {
       state.url = action.payload;
     }),
+
     initiallizeContainer: create.asyncThunk(
       async (action, payload) => {
         // console.log("check this :", action, payload)
@@ -95,9 +143,11 @@ export const webcontainerSlice = createAppSlice({
         },
       }
     ),
+
     selectFile: create.reducer((state, action) => {
       state.selectedFile.path = action.payload;
     }),
+
     addFile: create.asyncThunk(
       async ({ path, wcInstance, fileName }) => {
         await wcInstance.current.fs.writeFile(path, '');
@@ -113,6 +163,7 @@ export const webcontainerSlice = createAppSlice({
         }
       }
     ),
+
     addFolder: create.asyncThunk(
       async ({ path, wcInstance, fileName }) => {
         await wcInstance.current.fs.mkdir(path);
@@ -128,6 +179,7 @@ export const webcontainerSlice = createAppSlice({
         }
       }
     ),
+
     addDependency: create.asyncThunk(
       async ({ wcInstance, pckgName }) => {
         await installDependency(wcInstance, pckgName)
@@ -148,6 +200,54 @@ export const webcontainerSlice = createAppSlice({
         }
       }
     ),
+
+    deleteFile: create.asyncThunk(
+      async ({  path, wcInstance, isDirectory  }) => {
+        if(isDirectory)
+          await wcInstance.current.fs.rm(path, { recursive: true });
+        else
+          await wcInstance.current.fs.rm(path);
+
+        return { path, isDirectory }
+      },
+      {
+        pending: (state, action) => {
+
+        },
+        rejected: (state, action) => {
+
+        },
+        fulfilled: (state, action) => {
+          state.files = deleteFileOrFolderByPath(current(state.files), action.payload.path)
+        }
+      }
+    ),
+
+    renameFile: create.asyncThunk(
+      async ({ path, wcInstance, newName, endCb }) => {
+        const lastSlashIndex = path.lastIndexOf('/');
+        const pathDirectory = path.substring(0, lastSlashIndex + 1); 
+        await wcInstance.current.fs.rename(path, `${pathDirectory}/${newName}`);
+        return { path, newName, endCb }
+      },
+      {
+        pending: (state, action) => {
+
+        },
+        rejected: (state, action) => {
+
+        },
+        fulfilled: (state, action) => {
+          state.files = renameFileOrFolderByPath(current(state.files), action.payload.path, action.payload.newName)
+          action.payload.endCb()
+          const refresh = new CustomEvent('refresh');
+          document.dispatchEvent(refresh);
+        }
+      }
+    ),
+
+
+
   })
 });
 export const {
@@ -156,6 +256,8 @@ export const {
   selectFile,
   addFile,
   addFolder,
-  addDependency
+  addDependency,
+  deleteFile,
+  renameFile
 } = webcontainerSlice.actions;
 export default webcontainerSlice.reducer;
