@@ -91,9 +91,9 @@ function Folder({ name, explorer, firstTime, path }) {
     }
 
     if (explorer.hasOwnProperty('directory')) {
-        return <div style={{ marginTop: 5 }} key={name}>
+        return <div key={name}>
             <div
-                className={`flex cursor-pointer p-1 justify-between mt-1 hover:bg-gray-100 `}
+                className={`flex cursor-pointer justify-between hover:bg-gray-100 `}
                 onClick={(e) => {
                     setExpand((a) => {
                         return !a
@@ -103,31 +103,42 @@ function Folder({ name, explorer, firstTime, path }) {
                 onMouseEnter={() => setHovering(true)}
                 onMouseLeave={() => setHovering(false)}
             >
-                <div className="flex items-center">
-                    {
-                        expand ?
-                            <ChevronDownIcon className="w-4" /> :
-                            <ChevronRightIcon className="w-4" />
-                    }
+                <div className="flex items-center w-full">
+                    
                     {
                         isRenaming ?
+                            <form onSubmit={onRenameSubmit}>
+                                📁<input type="text" value={rename} onChange={(e) => setRename(e.target.value)} className="border flex justify-between" autoFocus />
+                            </form>
+                            :
                             <>
-                            📁<input type="text" value={rename} onChange={(e) => setRename(e.target.value)} className="border" autoFocus/>
-                            <span>submit</span>
-                            </> :
-                            <span>📁{name}</span>
+                                {
+                                    expand ?
+                                        <ChevronDownIcon className="w-4" /> :
+                                        <ChevronRightIcon className="w-4" />
+                                }
+                                <div className="flex justify-between w-full">
+                                    <span>📁{name}</span>
+                                    <div className={`flex items-center ${hovering ? "" : "invisible"}`}>
+                                        <DocumentPlusIcon className="w-4 text-gray-400" onClick={e => handleNewFolder(e, false)} />
+                                        <FolderPlusIcon className="w-4 text-gray-400" onClick={e => handleNewFolder(e, true)}/>
+                                        <PencilIcon className="w-4 text-gray-400" onClick={(e) => {
+                                            e.stopPropagation()
+                                            setRename(name)
+                                            setIsRenaming((i) => !i)
+                                        }} />
+                                        <TrashIcon className="w-4 text-gray-400" onClick={e => handleDelete(e, true)} />
+                                    </div>
+                                </div>
+                            </>
+                        // <>
+                        // 📁<input type="text" value={rename} onChange={(e) => setRename(e.target.value)} className="border" autoFocus/>
+                        // <span>submit</span>
+                        // </> :
+                        // <span>📁{name}</span>
                     }
                 </div>
-                <div className={`flex items-center ${hovering ? "" : "invisible"}`}>
-                    <DocumentPlusIcon className="w-4 text-gray-400" onClick={e => handleNewFolder(e, false)}/>
-                    <FolderPlusIcon className="w-4 text-gray-400"/>
-                    <PencilIcon className="w-4 text-gray-400" onClick={(e) => {
-                        e.stopPropagation()
-                        setRename(name)
-                        setIsRenaming((i) => !i)
-                    }}/>
-                    <TrashIcon className="w-4 text-gray-400" onClick={e => handleDelete(e, true)}/>
-                </div>
+                
             </div>
             <div
                 style={{ display: expand ? "block" : "none" }}
