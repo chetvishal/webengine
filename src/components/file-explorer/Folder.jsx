@@ -108,7 +108,15 @@ function Folder({ name, explorer, firstTime, path }) {
                     {
                         isRenaming ?
                             <form onSubmit={onRenameSubmit}>
-                                📁<input type="text" value={rename} onChange={(e) => setRename(e.target.value)} className="border flex justify-between" autoFocus />
+                                📁<input 
+                                    type="text" 
+                                    value={rename} 
+                                    onChange={(e) => setRename(e.target.value)} 
+                                    className="border" 
+                                    autoFocus 
+                                    onClick={e => e.stopPropagation()}
+                                    onBlur={() => setIsRenaming(false)}
+                                />
                             </form>
                             :
                             <>
@@ -187,7 +195,14 @@ function Folder({ name, explorer, firstTime, path }) {
                 isRenaming ?
                     <>
                         <form onSubmit={onRenameSubmit}>
-                            📄<input type="text" value={rename} onChange={(e) => setRename(e.target.value)} className="border" autoFocus />
+                            📄<input 
+                                type="text" 
+                                value={rename} 
+                                onChange={(e) => setRename(e.target.value)} 
+                                className="border" 
+                                autoFocus 
+                                onBlur={() => setIsRenaming(false)}
+                            />
                         </form>
                     </> :
                     <>
